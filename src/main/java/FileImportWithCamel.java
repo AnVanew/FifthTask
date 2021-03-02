@@ -4,17 +4,22 @@ import org.apache.camel.impl.DefaultCamelContext;
 
 public class FileImportWithCamel {
     public static void main(String[] args) throws Exception {
-		PropertyReader.loadProperties();
     	CamelContext context = new DefaultCamelContext();
-    	context.addRoutes(new RouteBuilder() {
+    	PropertyReader.loadProperties();
+    	context.getPropertiesComponent().setLocation("classpath:resources.properties");
+		String controlFile = "";
+		if (!PropertyReader.ACK_INPUT.isEmpty()) {
+			controlFile = "&doneFileName=${file:name}" + PropertyReader.ACK_INPUT;
+		}
+		String finalControlFile = controlFile;
+		context.addRoutes(new RouteBuilder() {
     		public void configure() {
-    			from("file:"+PropertyReader.INPUT_DIRECTORY.toAbsolutePath().toString()+"?delete=true")
-                .filter().method(Filter.class, "filter")
-				.to("file:"+PropertyReader.OUTPUT_DIRECTORY.toAbsolutePath().toString());
+    			from("file:{{INPUT_DIRECTORY}}"+"?delay={{INITIAL_DELAY}}}&delete=true" + finalControlFile)
+				.to("file:{{OUTPUT_DIRECTORY}}?");
     		}
     	});
     context.start();
-    Thread.sleep(1000);
+    Thread.sleep(500000);
     context.stop();
     }
 }

@@ -16,7 +16,7 @@ public class PropertyReader {
 
     public static void loadProperties () throws IOException {
         Properties properties = new Properties();
-        String pathPropFile = "resources.properties";
+        String pathPropFile = "src/main/resources/resources.properties";
         try ( FileInputStream fileInputStream = new FileInputStream(new File(pathPropFile)) ) {
             properties.load(fileInputStream);
             INPUT_DIRECTORY = Paths.get(properties.getProperty("INPUT_DIRECTORY"));
