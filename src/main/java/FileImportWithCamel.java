@@ -9,22 +9,23 @@ public class FileImportWithCamel {
     	CamelContext context = new DefaultCamelContext();
     	PropertyReader.loadProperties();
     	context.getPropertiesComponent().setLocation("classpath:resources.properties");
-		String controlFile = getDoneFile() ;
 		context.addRoutes(new RouteBuilder() {
     		public void configure() {
-    			from("file:{{INPUT_DIRECTORY}}"+"?delay={{INITIAL_DELAY}}}&delete=true&" + controlFile)
-				.to("file:{{OUTPUT_DIRECTORY}}?" +controlFile);
+    			from("file:{{INPUT_DIRECTORY}}?delay={{INITIAL_DELAY}}}&delete=true" + getDoneFile("&", ""))
+				.log("Trying to move file ${file:name} from {{INPUT_DIRECTORY}}")
+				.to("file:{{OUTPUT_DIRECTORY}}?" +getDoneFile("",""))
+    			.log("File ${file:name} is moved to {{OUTPUT_DIRECTORY}}");
     		}
     	});
-    context.start();
-    Thread.sleep(500000);
-    context.stop();
+    	context.start();
+    	Thread.sleep(500000);
+    	context.stop();
     }
 
-    private static String getDoneFile (){
+    private static String getDoneFile (String pre, String post){
 		String controlFile = "";
 		if (!PropertyReader.ACK_INPUT.isEmpty()) {
-			controlFile = "doneFileName=${file:name}" + PropertyReader.ACK_INPUT;
+			controlFile = pre + "doneFileName=${file:name}" + PropertyReader.ACK_INPUT + post;
 		}
 		return controlFile;
 	}
