@@ -11,7 +11,8 @@ public class FileImportWithCamel {
     	context.getPropertiesComponent().setLocation("classpath:resources.properties");
 		context.addRoutes(new RouteBuilder() {
     		public void configure() {
-    			from("file:{{INPUT_DIRECTORY}}?delay={{INITIAL_DELAY}}}&delete=true" + getDoneFile("&", ""))
+    			//from("file:{{INPUT_DIRECTORY}}?delay={{INITIAL_DELAY}}}&delete=true" + getDoneFile("&", ""))
+                from("jetty:http://0.0.0.0:9080/myservice")
 				.log("Trying to move file ${file:name} from {{INPUT_DIRECTORY}}")
 				.to("file:{{OUTPUT_DIRECTORY}}?" +getDoneFile("",""))
     			.log("File ${file:name} is moved to {{OUTPUT_DIRECTORY}}");
